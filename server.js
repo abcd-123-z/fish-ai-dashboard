@@ -8,11 +8,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use(
-  express.static(
-    path.join(__dirname, "public")
-  )
-);
+app.use(express.static(__dirname));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 app.post("/chat", (req, res) => {
 
@@ -24,7 +24,7 @@ app.post("/chat", (req, res) => {
 
       if (error) {
 
-        console.log(error);
+        console.log(stderr);
 
         return res.json({
           result: "AI Error"
@@ -33,12 +33,13 @@ app.post("/chat", (req, res) => {
 
       try {
 
-        const result =
-          JSON.parse(stdout);
+        const result = JSON.parse(stdout);
 
         res.json(result);
 
-      } catch {
+      } catch (err) {
+
+        console.log(err);
 
         res.json({
           result: "AI วิเคราะห์ไม่สำเร็จ"
@@ -50,8 +51,10 @@ app.post("/chat", (req, res) => {
 
 });
 
-app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
 
-  console.log("AI Server Running");
+app.listen(PORT, () => {
+
+  console.log(`Server running on port ${PORT}`);
 
 });
