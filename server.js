@@ -19,7 +19,7 @@ app.post("/chat", (req, res) => {
   const question = req.body.question;
 
   exec(
-    `python ai_engine.py "${question}"`,
+    `python3 ai_engine.py "${question}"`,
     (error, stdout, stderr) => {
 
       if (error) {
