@@ -1,446 +1,371 @@
-<!DOCTYPE html>
-<html lang="th">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Fish Tank AI Dashboard</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;background:#020617;color:white;min-height:100vh;padding:16px;}
 
-/* ===== RESET ===== */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+.header{text-align:center;padding:20px 0 24px;}
+.header h1{font-size:32px;font-weight:700;color:#7dd3fc;letter-spacing:-0.5px;}
+.header p{color:#64748b;font-size:14px;margin-top:4px;}
+
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.metric-card{background:#0f172a;border:0.5px solid #1e3a5f;border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.metric-card.temp-card::before{background:#38bdf8;}
+.metric-card.ph-card::before{background:#34d399;}
+.metric-card.time-card::before{background:#a78bfa;}
+.metric-label{font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.metric-value{font-size:32px;font-weight:700;line-height:1;}
+.metric-value.temp{color:#38bdf8;}
+.metric-value.ph{color:#34d399;}
+.metric-value.time-val{color:#a78bfa;font-size:20px;padding-top:6px;}
+.metric-icon{position:absolute;right:16px;top:16px;font-size:22px;opacity:0.25;}
+
+.main-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px;min-height:480px;}
+
+.charts-col{display:flex;flex-direction:column;gap:12px;}
+.chart-card{background:#0f172a;border:0.5px solid #1e293b;border-radius:16px;padding:16px;flex:1;display:flex;flex-direction:column;}
+.chart-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.chart-dot{width:8px;height:8px;border-radius:50%;}
+.chart-title{font-size:13px;color:#94a3b8;font-weight:500;}
+.chart-live{margin-left:auto;font-size:11px;background:rgba(56,189,248,0.12);color:#38bdf8;padding:2px 8px;border-radius:20px;border:0.5px solid rgba(56,189,248,0.3);}
+.chart-canvas-wrap{flex:1;position:relative;min-height:120px;}
+.chart-canvas-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important;}
+
+.chat-col{background:#0f172a;border:0.5px solid #1e293b;border-radius:16px;padding:0;display:flex;flex-direction:column;overflow:hidden;}
+.chat-header{padding:14px 16px;border-bottom:0.5px solid #1e293b;display:flex;align-items:center;gap:10px;}
+.chat-avatar{width:32px;height:32px;background:linear-gradient(135deg,#38bdf8,#818cf8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.chat-info h3{font-size:14px;font-weight:600;color:#f1f5f9;}
+.chat-info p{font-size:11px;color:#22c55e;}
+.status-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;margin-right:4px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+#chatBox{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0;}
+#chatBox::-webkit-scrollbar{width:4px;}
+#chatBox::-webkit-scrollbar-track{background:transparent;}
+#chatBox::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:4px;}
+
+.msg{max-width:88%;padding:9px 12px;font-size:13px;line-height:1.5;border-radius:12px;}
+.msg.user{align-self:flex-end;background:#1e3a5f;color:#bae6fd;border-bottom-right-radius:4px;}
+.msg.ai{align-self:flex-start;background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px;border:0.5px solid #334155;}
+.msg-label{font-size:10px;color:#475569;margin-bottom:2px;}
+
+.quick-row{display:flex;gap:6px;padding:10px 12px;flex-wrap:wrap;border-top:0.5px solid #1e293b;}
+.quick-btn{background:#0f172a;border:0.5px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;transition:all 0.2s;}
+.quick-btn:hover{background:#1e293b;color:#e2e8f0;border-color:#475569;}
+
+.input-row{padding:10px 12px;border-top:0.5px solid #1e293b;display:flex;gap:8px;}
+#userInput{flex:1;background:#1e293b;border:0.5px solid #334155;border-radius:10px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;transition:border-color 0.2s;}
+#userInput:focus{border-color:#38bdf8;}
+#userInput::placeholder{color:#475569;}
+.send-btn{background:#38bdf8;border:none;border-radius:10px;width:38px;height:38px;color:#020617;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.2s;flex-shrink:0;}
+.send-btn:hover{background:#7dd3fc;}
+
+@media(max-width:700px){
+  .main-grid{grid-template-columns:1fr;grid-template-rows:auto 420px;}
+  .metric-row{grid-template-columns:repeat(3,1fr);}
 }
-
-body{
-  font-family:Arial;
-  background:#020617;
-  color:white;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  padding:10px;
-}
-
-/* ===== TITLE ===== */
-.title{
-  text-align:center;
-  margin-bottom:15px;
-}
-
-.title h1{
-  color:#38bdf8;
-  font-size:40px;
-}
-
-.title p{
-  color:#94a3b8;
-}
-
-/* ===== TOP CARDS ===== */
-.card-container{
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  flex-wrap:wrap;
-  margin-bottom:15px;
-}
-
-.card{
-  background:rgba(30,41,59,0.9);
-  border-radius:20px;
-  padding:20px;
-  width:260px;
-  text-align:center;
-  transition:0.3s;
-}
-
-.card:hover{
-  transform:translateY(-5px);
-}
-
-.value{
-  font-size:38px;
-  font-weight:bold;
-}
-
-.temp{ color:#38bdf8; }
-.ph{ color:#22c55e; }
-
-/* ===== MAIN LAYOUT ===== */
-.dashboard-layout{
-  flex:1;
-  display:flex;
-  gap:15px;
-  min-height:0;
-}
-
-/* LEFT PANEL */
-.left-panel{
-  flex:2;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-  min-height:0;
-}
-
-/* RIGHT PANEL */
-.right-panel{
-  flex:1;
-  display:flex;
-  min-height:0;
-}
-
-/* ===== COMMON CARD ===== */
-.graph-card,
-.chat-card{
-  background:rgba(30,41,59,0.92);
-  border-radius:18px;
-  padding:15px;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-  min-height:0;
-}
-
-/* ===== GRAPH ===== */
-.graph-title{
-  color:#94a3b8;
-  margin-bottom:10px;
-}
-
-.graph-card canvas{
-  flex:1;
-  width:100% !important;
-  height:100% !important;
-}
-
-/* ===== CHAT ===== */
-.chat-card{
-  display:flex;
-  flex-direction:column;
-}
-
-#chatBox{
-  flex:1;
-  overflow-y:auto;
-  background:rgba(15,23,42,0.6);
-  border-radius:12px;
-  padding:10px;
-  min-height:0;
-}
-
-.user-message{
-  margin-bottom:10px;
-  color:#38bdf8;
-}
-
-.ai-message{
-  margin-bottom:10px;
-  color:white;
-}
-
-/* INPUT */
-.input-area{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
-
-#userInput{
-  flex:1;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#334155;
-  color:white;
-  outline:none;
-}
-
-.send-btn{
-  padding:12px 18px;
-  border:none;
-  border-radius:12px;
-  background:#38bdf8;
-  color:white;
-  cursor:pointer;
-}
-
-/* QUICK BUTTONS */
-.quick-buttons{
-  margin-top:10px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.quick-buttons button{
-  background:#334155;
-  border:none;
-  padding:8px 12px;
-  border-radius:10px;
-  color:white;
-  cursor:pointer;
-}
-
-/* ===== MOBILE ===== */
-@media(max-width:900px){
-  .dashboard-layout{
-    flex-direction:column;
-  }
-
-  .title h1{
-    font-size:30px;
-  }
-
-  .value{
-    font-size:30px;
-  }
-}
-
 </style>
-</head>
 
-<body>
-
-<div class="title">
+<div class="header">
   <h1>🐠 Fish Tank AI Dashboard</h1>
-  <p>ระบบวิเคราะห์คุณภาพน้ำอัจฉริยะ</p>
+  <p>ระบบวิเคราะห์คุณภาพน้ำ</p>
 </div>
 
-<!-- TOP CARDS -->
-<div class="card-container">
-
-  <div class="card">
-    <h2>🌡 อุณหภูมิ</h2>
-    <div class="value temp" id="temp">-- °C</div>
+<div class="metric-row">
+  <div class="metric-card temp-card">
+    <div class="metric-label">อุณหภูมิ</div>
+    <div class="metric-value temp" id="temp">-- °C</div>
+    <div class="metric-icon">🌡</div>
   </div>
-
-  <div class="card">
-    <h2>🧪 ค่า pH</h2>
-    <div class="value ph" id="ph">--</div>
+  <div class="metric-card ph-card">
+    <div class="metric-label">ค่า pH</div>
+    <div class="metric-value ph" id="ph">--</div>
+    <div class="metric-icon">🧪</div>
   </div>
-
-  <div class="card">
-    <h2>⏰ เวลา</h2>
-    <div class="value" id="time">--</div>
+  <div class="metric-card time-card">
+    <div class="metric-label">อัปเดตล่าสุด</div>
+    <div class="metric-value time-val" id="time">--</div>
+    <div class="metric-icon">⏰</div>
   </div>
-
 </div>
 
-<!-- MAIN -->
-<div class="dashboard-layout">
-
-  <!-- LEFT -->
-  <div class="left-panel">
-
-    <div class="graph-card">
-      <h2 class="graph-title">🌡 กราฟอุณหภูมิ</h2>
-      <canvas id="tempChart"></canvas>
-    </div>
-
-    <div class="graph-card">
-      <h2 class="graph-title">🧪 กราฟค่า pH</h2>
-      <canvas id="phChart"></canvas>
-    </div>
-
-  </div>
-
-  <!-- RIGHT -->
-  <div class="right-panel">
-
-    <div class="chat-card">
-
-      <h2 style="color:#94a3b8;margin-bottom:10px;">🤖 AI Assistant</h2>
-
-      <div id="chatBox"></div>
-
-      <div class="input-area">
-        <input type="text" id="userInput" placeholder="ถาม AI เกี่ยวกับตู้ปลา...">
-        <button class="send-btn" onclick="sendMessage()">ส่ง</button>
+<div class="main-grid">
+  <div class="charts-col">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-dot" style="background:#38bdf8;"></div>
+        <span class="chart-title">อุณหภูมิ (°C)</span>
+        <span class="chart-live">● LIVE</span>
       </div>
-
-      <div class="quick-buttons">
-        <button onclick="quickAsk('อุณหภูมิตอนนี้เป็นยังไง')">🌡 อุณหภูมิ</button>
-        <button onclick="quickAsk('ค่า ph ตอนนี้เป็นยังไง')">🧪 pH</button>
-        <button onclick="quickAsk('แนวโน้มของระบบเป็นยังไง')">📈 แนวโน้ม</button>
-        <button onclick="quickAsk('ระบบกำลังทำงานปกติไหม')">⚙ ระบบ</button>
-      </div>
-
+      <div class="chart-canvas-wrap"><canvas id="tempChart"></canvas></div>
     </div>
-
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-dot" style="background:#34d399;"></div>
+        <span class="chart-title">ค่า pH</span>
+        <span class="chart-live" style="color:#34d399;background:rgba(52,211,153,0.1);border-color:rgba(52,211,153,0.3);">● LIVE</span>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="phChart"></canvas></div>
+    </div>
   </div>
 
+  <div class="chat-col">
+    <div class="chat-header">
+      <div class="chat-avatar">🤖</div>
+      <div class="chat-info">
+        <h3>AI Assistant</h3>
+        <p><span class="status-dot"></span>ออนไลน์</p>
+      </div>
+    </div>
+
+    <div id="chatBox">
+      <div class="msg-label" style="align-self:flex-start;padding:0 2px;">AI</div>
+      <div class="msg ai">สวัสดี 😄 ผมคือ AI วิเคราะห์ตู้ปลา ถามได้เลยครับ!</div>
+    </div>
+
+    <div class="quick-row">
+      <button class="quick-btn" onclick="quickAsk('อุณหภูมิตอนนี้เป็นยังไง')">🌡 อุณหภูมิ</button>
+      <button class="quick-btn" onclick="quickAsk('ค่า ph ตอนนี้เป็นยังไง')">🧪 pH</button>
+      <button class="quick-btn" onclick="quickAsk('แนวโน้มของระบบเป็นยังไง')">📈 แนวโน้ม</button>
+      <button class="quick-btn" onclick="quickAsk('ระบบกำลังทำงานปกติไหม')">⚙ ระบบ</button>
+    </div>
+
+    <div class="input-row">
+      <input type="text" id="userInput" placeholder="ถาม AI เกี่ยวกับตู้ปลา...">
+      <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
+const sheetURL="https://docs.google.com/spreadsheets/d/1dRyT0iPaTrrxnfon_TEqO6rcdZSSHGwUGZG-H0KjZYQ/export?format=csv";
 
-// ===== SHEET =====
-const sheetURL =
-"https://docs.google.com/spreadsheets/d/1dRyT0iPaTrrxnfon_TEqO6rcdZSSHGwUGZG-H0KjZYQ/gviz/tq?tqx=out:csv";
+let labels=[],temps=[],phs=[],tempChart,phChart;
 
-let labels = [];
-let temps = [];
-let phs = [];
-
-let tempChart;
-let phChart;
+const chartDefaults={
+  type:"line",
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    animation:{duration:400},
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        enabled:true,
+        backgroundColor:"#0f172a",
+        titleColor:"#94a3b8",
+        bodyColor:"#e2e8f0",
+        borderColor:"#334155",
+        borderWidth:1
+      }
+    },
+    scales:{
+      y:{
+        grid:{color:"rgba(255,255,255,0.05)"},
+        ticks:{color:"#475569",font:{size:11}},
+        border:{color:"transparent"}
+      },
+      x:{
+        grid:{display:false},
+        ticks:{color:"#475569",font:{size:10},maxTicksLimit:6},
+        border:{color:"transparent"}
+      }
+    }
+  }
+};
 
 async function loadData(){
+  try{
+    const res = await fetch(sheetURL);
+    if(!res.ok) throw new Error("HTTP " + res.status);
 
-  const res = await fetch(sheetURL);
-  const text = await res.text();
+    const text = await res.text();
 
-  const rows = text.trim().split("\n");
+    console.log("RAW CSV:", text.slice(0,200));
 
-  labels = [];
-  temps = [];
-  phs = [];
+    const rows = text.split(/\r?\n/);
 
-  for(let i=1;i<rows.length;i++){
+    labels = [];
+    temps = [];
+    phs = [];
 
-    const cols = rows[i].split(",");
+    for(let i=1;i<rows.length;i++){
+      const row = rows[i].trim();
+      if(!row) continue;
 
-    const time = (cols[1] || "").replace(/"/g,'').trim();
-    const temp = parseFloat(cols[2]);
-    const ph = parseFloat(cols[3]);
+      // ✅ robust CSV split (รองรับ "...")
+      const cols = parseCSV(row);
 
-    if(!isNaN(temp) && !isNaN(ph)){
-      labels.push(time);
+      if(cols.length < 4) continue;
+
+      const date = cols[0];
+      const time = cols[1];
+
+      const temp = parseFloat(cols[2]);
+      const ph   = parseFloat(cols[3]);
+
+      if(isNaN(temp) || isNaN(ph)) continue;
+
+      labels.push(`${date} ${time}`);
       temps.push(temp);
       phs.push(ph);
     }
+
+    console.log("labels:", labels.length);
+    console.log("temps:", temps.length);
+    console.log("phs:", phs.length);
+
+    if(labels.length === 0){
+      console.warn("❌ NO DATA FOUND (check sheet format or permission)");
+      return;
+    }
+
+    document.getElementById("temp").textContent = `${temps.at(-1)} °C`;
+    document.getElementById("ph").textContent = `${phs.at(-1)}`;
+    document.getElementById("time").textContent = labels.at(-1);
+
+    drawCharts();
+
+  }catch(e){
+    console.error("Load error:", e);
+  }
+}
+
+// 🔥 CSV parser ที่ “ไม่พัง”
+function parseCSV(str){
+  const result = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for(let i=0;i<str.length;i++){
+    const c = str[i];
+
+    if(c === '"') inQuotes = !inQuotes;
+    else if(c === ',' && !inQuotes){
+      result.push(cur.trim().replace(/"/g,''));
+      cur = "";
+    } else {
+      cur += c;
+    }
   }
 
-  document.getElementById("temp").innerHTML = `${temps.at(-1) ?? 0} °C`;
-  document.getElementById("ph").innerHTML = `${phs.at(-1) ?? 0}`;
-  document.getElementById("time").innerHTML = labels.at(-1) ?? "-";
-
-  drawCharts();
+  result.push(cur.trim().replace(/"/g,''));
+  return result;
 }
 
 function drawCharts(){
-
   if(tempChart) tempChart.destroy();
   if(phChart) phChart.destroy();
 
-  const tempCtx = document.getElementById("tempChart").getContext("2d");
-  const phCtx = document.getElementById("phChart").getContext("2d");
+  const ctx1=document.getElementById("tempChart").getContext("2d");
+  const ctx2=document.getElementById("phChart").getContext("2d");
 
-  tempChart = new Chart(tempCtx,{
-    type:"line",
+  tempChart=new Chart(ctx1,{
+    ...chartDefaults,
     data:{
       labels,
       datasets:[{
-        label:"อุณหภูมิ (°C)",
+        label:"Temp",
         data:temps,
         borderColor:"#38bdf8",
+        backgroundColor:"rgba(56,189,248,0.06)",
+        fill:true,
         tension:0.4,
         pointRadius:0,
-        borderWidth:3
+        borderWidth:2
       }]
     },
     options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{
-        y:{ min:20, max:35 },
-        x:{}
-      }
+      ...chartDefaults.options,
+      scales:{...chartDefaults.options.scales,y:{min:20,max:35}}
     }
   });
 
-  phChart = new Chart(phCtx,{
-    type:"line",
+  phChart=new Chart(ctx2,{
+    ...chartDefaults,
     data:{
       labels,
       datasets:[{
         label:"pH",
         data:phs,
-        borderColor:"#22c55e",
+        borderColor:"#34d399",
+        backgroundColor:"rgba(52,211,153,0.06)",
+        fill:true,
         tension:0.4,
         pointRadius:0,
-        borderWidth:3
+        borderWidth:2
       }]
     },
     options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{
-        y:{ min:0, max:14 },
-        x:{}
-      }
+      ...chartDefaults.options,
+      scales:{...chartDefaults.options.scales,y:{min:0,max:14}}
     }
   });
 }
 
-// ===== CHAT =====
-function addMessage(sender,text,type){
+// ===== chat (เหมือนเดิม) =====
+function addMsg(sender,text,type){
+  const box=document.getElementById("chatBox");
 
-  const chatBox = document.getElementById("chatBox");
+  const lbl=document.createElement("div");
+  lbl.className="msg-label";
+  lbl.style.alignSelf=type==="user"?"flex-end":"flex-start";
+  lbl.textContent=sender;
 
-  const div = document.createElement("div");
-  div.className = type;
-  div.innerHTML = `<b>${sender}:</b> ${text}`;
+  const div=document.createElement("div");
+  div.className="msg "+type;
+  div.textContent=text;
 
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
+  box.appendChild(lbl);
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
 }
 
-function quickAsk(text){
-  document.getElementById("userInput").value = text;
+function quickAsk(t){
+  document.getElementById("userInput").value=t;
   sendMessage();
 }
 
 async function sendMessage(){
+  const input=document.getElementById("userInput");
+  const q=input.value.trim();
+  if(!q)return;
 
-  const input = document.getElementById("userInput");
-  const question = input.value;
-
-  if(!question.trim()) return;
-
-  addMessage("คุณ",question,"user-message");
+  addMsg("คุณ",q,"user");
   input.value="";
 
-  addMessage("AI","กำลังวิเคราะห์...","ai-message");
+  addMsg("AI","กำลังวิเคราะห์...","ai");
 
   try{
-
-    const res = await fetch("/chat",{
+    const res=await fetch("/chat",{
       method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ question })
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({question:q})
     });
 
-    const data = await res.json();
+    const data=await res.json();
 
-    const chatBox = document.getElementById("chatBox");
-    chatBox.removeChild(chatBox.lastChild);
+    const box=document.getElementById("chatBox");
+    box.removeChild(box.lastChild);
+    box.removeChild(box.lastChild);
 
-    addMessage("AI",data.result,"ai-message");
+    addMsg("AI",data.result,"ai");
 
   }catch(e){
-    addMessage("AI","เชื่อมต่อ AI ไม่สำเร็จ","ai-message");
+    const box=document.getElementById("chatBox");
+    box.removeChild(box.lastChild);
+    box.removeChild(box.lastChild);
+
+    addMsg("AI","เชื่อมต่อ AI ไม่สำเร็จ","ai");
   }
 }
 
 document.getElementById("userInput")
-.addEventListener("keypress",e=>{
-  if(e.key==="Enter") sendMessage();
-});
+  .addEventListener("keypress",e=>{
+    if(e.key==="Enter")sendMessage();
+  });
 
 loadData();
 setInterval(loadData,5000);
-
-addMessage("AI","สวัสดี 😄 ผมคือ AI วิเคราะห์ตู้ปลา","ai-message");
-
 </script>
-
-</body>
-</html>
