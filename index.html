@@ -1,371 +1,1301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>AquaMind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:Arial,sans-serif;background:#020617;color:white;min-height:100vh;padding:16px;}
 
-.header{text-align:center;padding:20px 0 24px;}
-.header h1{font-size:32px;font-weight:700;color:#7dd3fc;letter-spacing:-0.5px;}
-.header p{color:#64748b;font-size:14px;margin-top:4px;}
-
-.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
-.metric-card{background:#0f172a;border:0.5px solid #1e3a5f;border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;}
-.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.metric-card.temp-card::before{background:#38bdf8;}
-.metric-card.ph-card::before{background:#34d399;}
-.metric-card.time-card::before{background:#a78bfa;}
-.metric-label{font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
-.metric-value{font-size:32px;font-weight:700;line-height:1;}
-.metric-value.temp{color:#38bdf8;}
-.metric-value.ph{color:#34d399;}
-.metric-value.time-val{color:#a78bfa;font-size:20px;padding-top:6px;}
-.metric-icon{position:absolute;right:16px;top:16px;font-size:22px;opacity:0.25;}
-
-.main-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px;min-height:480px;}
-
-.charts-col{display:flex;flex-direction:column;gap:12px;}
-.chart-card{background:#0f172a;border:0.5px solid #1e293b;border-radius:16px;padding:16px;flex:1;display:flex;flex-direction:column;}
-.chart-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.chart-dot{width:8px;height:8px;border-radius:50%;}
-.chart-title{font-size:13px;color:#94a3b8;font-weight:500;}
-.chart-live{margin-left:auto;font-size:11px;background:rgba(56,189,248,0.12);color:#38bdf8;padding:2px 8px;border-radius:20px;border:0.5px solid rgba(56,189,248,0.3);}
-.chart-canvas-wrap{flex:1;position:relative;min-height:120px;}
-.chart-canvas-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important;}
-
-.chat-col{background:#0f172a;border:0.5px solid #1e293b;border-radius:16px;padding:0;display:flex;flex-direction:column;overflow:hidden;}
-.chat-header{padding:14px 16px;border-bottom:0.5px solid #1e293b;display:flex;align-items:center;gap:10px;}
-.chat-avatar{width:32px;height:32px;background:linear-gradient(135deg,#38bdf8,#818cf8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.chat-info h3{font-size:14px;font-weight:600;color:#f1f5f9;}
-.chat-info p{font-size:11px;color:#22c55e;}
-.status-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;margin-right:4px;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-
-#chatBox{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0;}
-#chatBox::-webkit-scrollbar{width:4px;}
-#chatBox::-webkit-scrollbar-track{background:transparent;}
-#chatBox::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:4px;}
-
-.msg{max-width:88%;padding:9px 12px;font-size:13px;line-height:1.5;border-radius:12px;}
-.msg.user{align-self:flex-end;background:#1e3a5f;color:#bae6fd;border-bottom-right-radius:4px;}
-.msg.ai{align-self:flex-start;background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px;border:0.5px solid #334155;}
-.msg-label{font-size:10px;color:#475569;margin-bottom:2px;}
-
-.quick-row{display:flex;gap:6px;padding:10px 12px;flex-wrap:wrap;border-top:0.5px solid #1e293b;}
-.quick-btn{background:#0f172a;border:0.5px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;transition:all 0.2s;}
-.quick-btn:hover{background:#1e293b;color:#e2e8f0;border-color:#475569;}
-
-.input-row{padding:10px 12px;border-top:0.5px solid #1e293b;display:flex;gap:8px;}
-#userInput{flex:1;background:#1e293b;border:0.5px solid #334155;border-radius:10px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;transition:border-color 0.2s;}
-#userInput:focus{border-color:#38bdf8;}
-#userInput::placeholder{color:#475569;}
-.send-btn{background:#38bdf8;border:none;border-radius:10px;width:38px;height:38px;color:#020617;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.2s;flex-shrink:0;}
-.send-btn:hover{background:#7dd3fc;}
-
-@media(max-width:700px){
-  .main-grid{grid-template-columns:1fr;grid-template-rows:auto 420px;}
-  .metric-row{grid-template-columns:repeat(3,1fr);}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
+
+body{
+  font-family:'Prompt',sans-serif;
+  background:#f6f1e8;
+  color:#3f372f;
+}
+
+/* ===== APP ===== */
+
+.app{
+  max-width:500px;
+  margin:auto;
+  min-height:100vh;
+
+  background:
+  linear-gradient(
+    180deg,
+    #f8f4ec 0%,
+    #f3ede2 100%
+  );
+
+  position:relative;
+  overflow:hidden;
+}
+
+/* ===== PAGE ===== */
+
+.page{
+  display:none;
+  padding:24px 20px 140px;
+  min-height:100vh;
+}
+
+.page.active{
+  display:block;
+}
+
+/* ===== HEADER ===== */
+
+.top-header{
+  margin-bottom:24px;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:18px;
+}
+
+.logo span{
+  color:#8dbb8c;
+}
+
+/* ===== DATE ===== */
+
+.date-box{
+  background:
+  rgba(255,255,255,0.72);
+
+  border-radius:24px;
+
+  padding:16px 18px;
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  margin-bottom:22px;
+
+  box-shadow:
+  0 6px 18px rgba(0,0,0,0.04);
+}
+
+.date-icon{
+  width:54px;
+  height:54px;
+
+  border-radius:18px;
+
+  background:#f3ead8;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:24px;
+}
+
+.date-title{
+  font-size:13px;
+  color:#9a8f82;
+  margin-bottom:4px;
+}
+
+.date-time{
+  font-size:18px;
+  font-weight:600;
+  color:#443a32;
+}
+
+/* ===== WELCOME ===== */
+
+.welcome h1{
+  font-size:36px;
+  line-height:1.2;
+  margin-bottom:8px;
+}
+
+.welcome p{
+  color:#85796c;
+  font-size:14px;
+}
+
+/* ===== STATUS CARD ===== */
+
+.status-card{
+  background:
+  rgba(255,255,255,0.7);
+
+  backdrop-filter:blur(10px);
+
+  border-radius:28px;
+
+  padding:22px;
+
+  box-shadow:
+  0 8px 25px rgba(0,0,0,0.05);
+
+  margin-bottom:18px;
+}
+
+.status-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.status-title{
+  font-size:22px;
+  font-weight:600;
+}
+
+.online{
+  background:#e3f3e6;
+  color:#4f9b5d;
+  padding:6px 12px;
+  border-radius:18px;
+  font-size:12px;
+}
+
+/* ===== SENSOR GRID ===== */
+
+.sensor-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.sensor-card{
+  background:#f8f3ea;
+  border-radius:22px;
+  padding:18px;
+}
+
+.sensor-icon{
+  font-size:26px;
+  margin-bottom:10px;
+}
+
+.sensor-label{
+  color:#8b7e70;
+  font-size:13px;
+  margin-bottom:6px;
+}
+
+.sensor-value{
+  font-size:34px;
+  font-weight:700;
+}
+
+.sensor-status{
+  display:inline-block;
+  margin-top:10px;
+  background:#dff2e3;
+  color:#4d9861;
+  padding:5px 10px;
+  border-radius:16px;
+  font-size:12px;
+}
+
+/* ===== HEALTH ===== */
+
+.light-card{
+  margin-bottom:20px;
+
+  background:
+  rgba(255,255,255,0.75);
+
+  border-radius:24px;
+
+  padding:22px;
+
+  box-shadow:
+  0 6px 18px rgba(0,0,0,0.04);
+}
+
+.light-top{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.light-icon{
+  width:50px;
+  height:50px;
+  border-radius:18px;
+  background:#f6edda;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:24px;
+}
+
+.light-info h3{
+  font-size:15px;
+  color:#8b7f71;
+}
+
+.light-info h1{
+  font-size:38px;
+}
+
+.progress{
+  height:8px;
+  border-radius:20px;
+  background:#ece7df;
+  margin-top:18px;
+  overflow:hidden;
+}
+
+.progress-bar{
+  width:85%;
+  height:100%;
+  background:#c6a46b;
+  border-radius:20px;
+}
+
+/* ===== CHART ===== */
+
+.chart-card{
+  background:
+  rgba(255,255,255,0.78);
+
+  border-radius:28px;
+
+  padding:20px;
+
+  box-shadow:
+  0 6px 18px rgba(0,0,0,0.04);
+}
+
+.chart-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.chart-header h2{
+  font-size:22px;
+}
+
+.day-btn{
+  background:#f4efe7;
+  border:none;
+  padding:10px 16px;
+  border-radius:16px;
+  font-family:'Prompt',sans-serif;
+}
+
+.chart-wrap{
+  height:240px;
+}
+
+/* ===== FILTER ===== */
+
+.filter-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.filter-btn{
+  border:none;
+
+  background:
+  rgba(255,255,255,0.8);
+
+  padding:12px 16px;
+
+  border-radius:16px;
+
+  font-family:'Prompt',sans-serif;
+
+  color:#8b7f71;
+
+  font-size:14px;
+}
+
+.filter-btn.active{
+  background:#d8bc8b;
+  color:white;
+}
+
+/* ===== AI ===== */
+
+.ai-top{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.ai-avatar{
+  width:70px;
+  height:70px;
+  border-radius:24px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #d8ebf8,
+    #f3e7d6
+  );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:34px;
+}
+
+.ai-info h1{
+  font-size:30px;
+}
+
+.ai-info p{
+  color:#8a7f72;
+  font-size:14px;
+}
+
+/* ===== CONTROL ===== */
+
+.control-title{
+  font-size:24px;
+  font-weight:600;
+  margin-bottom:18px;
+}
+
+.control-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:24px;
+}
+
+.control-card{
+  background:
+  rgba(255,255,255,0.75);
+
+  border-radius:24px;
+
+  padding:20px;
+
+  text-align:center;
+
+  box-shadow:
+  0 6px 16px rgba(0,0,0,0.04);
+}
+
+.control-icon{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.control-name{
+  font-size:15px;
+  margin-bottom:8px;
+}
+
+.control-status{
+  display:inline-block;
+  background:#e5f5e9;
+  color:#4c9962;
+  padding:5px 12px;
+  border-radius:16px;
+  font-size:12px;
+}
+
+/* ===== CHAT ===== */
+
+.chat-box{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding-bottom:120px;
+}
+
+.msg{
+  max-width:85%;
+  padding:16px;
+  border-radius:22px;
+  line-height:1.6;
+  font-size:14px;
+}
+
+.ai-msg{
+  background:
+  rgba(255,255,255,0.8);
+
+  align-self:flex-start;
+}
+
+.user-msg{
+  background:#efe2c9;
+  align-self:flex-end;
+}
+
+/* ===== INPUT ===== */
+
+.input-row{
+  position:fixed;
+  bottom:92px;
+  left:50%;
+  transform:translateX(-50%);
+
+  width:100%;
+  max-width:500px;
+
+  padding:0 18px;
+}
+
+.input-wrap{
+  background:white;
+  border-radius:26px;
+
+  padding:10px;
+
+  display:flex;
+  gap:10px;
+
+  box-shadow:
+  0 8px 20px rgba(0,0,0,0.06);
+}
+
+#userInput{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+
+  font-family:'Prompt',sans-serif;
+  font-size:15px;
+  color:#4b4036;
+
+  padding-left:10px;
+}
+
+.send-btn{
+  width:48px;
+  height:48px;
+
+  border:none;
+
+  border-radius:18px;
+
+  background:#d7bc8f;
+
+  color:white;
+
+  font-size:18px;
+}
+
+/* ===== NAV ===== */
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+
+  width:100%;
+  max-width:500px;
+
+  background:
+  rgba(255,255,255,0.88);
+
+  backdrop-filter:blur(12px);
+
+  display:flex;
+  justify-content:space-around;
+
+  padding:14px 0 20px;
+
+  border-top:
+  1px solid rgba(0,0,0,0.04);
+}
+
+.nav-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+
+  color:#9b8d7f;
+
+  font-size:12px;
+
+  cursor:pointer;
+}
+
+.nav-item.active{
+  color:#c09a5b;
+}
+
+.nav-icon{
+  font-size:26px;
+}
+
 </style>
+</head>
 
-<div class="header">
-  <h1>🐠 Fish Tank AI Dashboard</h1>
-  <p>ระบบวิเคราะห์คุณภาพน้ำ</p>
-</div>
+<body>
 
-<div class="metric-row">
-  <div class="metric-card temp-card">
-    <div class="metric-label">อุณหภูมิ</div>
-    <div class="metric-value temp" id="temp">-- °C</div>
-    <div class="metric-icon">🌡</div>
-  </div>
-  <div class="metric-card ph-card">
-    <div class="metric-label">ค่า pH</div>
-    <div class="metric-value ph" id="ph">--</div>
-    <div class="metric-icon">🧪</div>
-  </div>
-  <div class="metric-card time-card">
-    <div class="metric-label">อัปเดตล่าสุด</div>
-    <div class="metric-value time-val" id="time">--</div>
-    <div class="metric-icon">⏰</div>
-  </div>
-</div>
+<div class="app">
 
-<div class="main-grid">
-  <div class="charts-col">
+  <!-- ================= HOME ================= -->
+
+  <div class="page active" id="homePage">
+
+    <div class="top-header">
+
+      <div class="logo">
+        Aqua<span>Mind</span>
+      </div>
+
+      <div class="date-box">
+
+        <div class="date-icon">
+          📅
+        </div>
+
+        <div class="date-info">
+
+          <div class="date-title">
+            วันนี้
+          </div>
+
+          <div class="date-time" id="liveDate">
+            14 เมษายน 2568 • 11:32 น.
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="welcome">
+
+        <h1>
+          สวัสดี,<br>
+          อความายด์
+        </h1>
+
+        <p>
+          ระบบ AI ตรวจสอบตู้ปลาอัจฉริยะ
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- STATUS -->
+
+    <div class="status-card">
+
+      <div class="status-top">
+
+        <div class="status-title">
+          สถานะตู้ปลา
+        </div>
+
+        <div class="online">
+          ● เชื่อมต่อแล้ว
+        </div>
+
+      </div>
+
+      <div class="sensor-grid">
+
+        <div class="sensor-card">
+
+          <div class="sensor-icon">
+            🌡️
+          </div>
+
+          <div class="sensor-label">
+            อุณหภูมิ
+          </div>
+
+          <div class="sensor-value" id="temp">
+            26.5°C
+          </div>
+
+          <div class="sensor-status">
+            ปกติ
+          </div>
+
+        </div>
+
+        <div class="sensor-card">
+
+          <div class="sensor-icon">
+            🧪
+          </div>
+
+          <div class="sensor-label">
+            ค่า pH
+          </div>
+
+          <div class="sensor-value" id="ph">
+            7.2
+          </div>
+
+          <div class="sensor-status">
+            ปกติ
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- HEALTH -->
+
+    <div class="light-card">
+
+      <div class="light-top">
+
+        <div class="light-icon">
+          ☀️
+        </div>
+
+        <div class="light-info">
+
+          <h3>
+            คุณภาพน้ำ
+          </h3>
+
+          <h1 id="health">
+            85%
+          </h1>
+
+        </div>
+
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar"></div>
+      </div>
+
+    </div>
+
+    <!-- CHART -->
+
     <div class="chart-card">
+
       <div class="chart-header">
-        <div class="chart-dot" style="background:#38bdf8;"></div>
-        <span class="chart-title">อุณหภูมิ (°C)</span>
-        <span class="chart-live">● LIVE</span>
+
+        <h2>
+          แนวโน้มอุณหภูมิ
+        </h2>
+
+        <button class="day-btn">
+          วันนี้
+        </button>
+
       </div>
-      <div class="chart-canvas-wrap"><canvas id="tempChart"></canvas></div>
+
+      <div class="chart-wrap">
+        <canvas id="tempChart"></canvas>
+      </div>
+
     </div>
+
+  </div>
+
+  <!-- ================= STATS ================= -->
+
+  <div class="page" id="statsPage">
+
+    <div class="logo">
+      Aqua<span>Mind</span>
+    </div>
+
+    <div class="welcome">
+
+      <h1>
+        สถิติระบบ
+      </h1>
+
+      <p>
+        วิเคราะห์ข้อมูลย้อนหลัง
+      </p>
+
+    </div>
+
+    <!-- FILTER -->
+
+    <div class="filter-row">
+
+      <button class="filter-btn active">
+        1 ชั่วโมง
+      </button>
+
+      <button class="filter-btn">
+        24 ชั่วโมง
+      </button>
+
+      <button class="filter-btn">
+        7 วัน
+      </button>
+
+    </div>
+
+    <!-- TEMP -->
+
     <div class="chart-card">
+
       <div class="chart-header">
-        <div class="chart-dot" style="background:#34d399;"></div>
-        <span class="chart-title">ค่า pH</span>
-        <span class="chart-live" style="color:#34d399;background:rgba(52,211,153,0.1);border-color:rgba(52,211,153,0.3);">● LIVE</span>
+
+        <h2>
+          🌡️ อุณหภูมิ
+        </h2>
+
       </div>
-      <div class="chart-canvas-wrap"><canvas id="phChart"></canvas></div>
+
+      <div class="chart-wrap">
+        <canvas id="statsTempChart"></canvas>
+      </div>
+
     </div>
+
+    <!-- PH -->
+
+    <div
+    class="chart-card"
+    style="margin-top:18px;">
+
+      <div class="chart-header">
+
+        <h2>
+          🧪 ค่า pH
+        </h2>
+
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="statsPhChart"></canvas>
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="chat-col">
-    <div class="chat-header">
-      <div class="chat-avatar">🤖</div>
-      <div class="chat-info">
-        <h3>AI Assistant</h3>
-        <p><span class="status-dot"></span>ออนไลน์</p>
+  <!-- ================= AI ================= -->
+
+  <div class="page" id="aiPage">
+
+    <div class="ai-top">
+
+      <div class="ai-avatar">
+        🤖
       </div>
+
+      <div class="ai-info">
+
+        <h1>
+          AI ผู้ช่วย
+        </h1>
+
+        <p>
+          พร้อมดูแลตู้ปลาของคุณ
+        </p>
+
+      </div>
+
     </div>
 
-    <div id="chatBox">
-      <div class="msg-label" style="align-self:flex-start;padding:0 2px;">AI</div>
-      <div class="msg ai">สวัสดี 😄 ผมคือ AI วิเคราะห์ตู้ปลา ถามได้เลยครับ!</div>
+    <!-- CONTROL -->
+
+    <div class="control-title">
+      การควบคุมด่วน
     </div>
 
-    <div class="quick-row">
-      <button class="quick-btn" onclick="quickAsk('อุณหภูมิตอนนี้เป็นยังไง')">🌡 อุณหภูมิ</button>
-      <button class="quick-btn" onclick="quickAsk('ค่า ph ตอนนี้เป็นยังไง')">🧪 pH</button>
-      <button class="quick-btn" onclick="quickAsk('แนวโน้มของระบบเป็นยังไง')">📈 แนวโน้ม</button>
-      <button class="quick-btn" onclick="quickAsk('ระบบกำลังทำงานปกติไหม')">⚙ ระบบ</button>
+    <div class="control-grid">
+
+      <div class="control-card">
+
+        <div class="control-icon">
+          🌀
+        </div>
+
+        <div class="control-name">
+          เปิดพัดลม
+        </div>
+
+        <div class="control-status">
+          อัตโนมัติ
+        </div>
+
+      </div>
+
+      <div class="control-card">
+
+        <div class="control-icon">
+          💧
+        </div>
+
+        <div class="control-name">
+          ปั๊มน้ำ
+        </div>
+
+        <div class="control-status">
+          อัตโนมัติ
+        </div>
+
+      </div>
+
+      <div class="control-card">
+
+        <div class="control-icon">
+          🫧
+        </div>
+
+        <div class="control-name">
+          ปั๊มออกซิเจน
+        </div>
+
+        <div class="control-status">
+          อัตโนมัติ
+        </div>
+
+      </div>
+
+      <div class="control-card">
+
+        <div class="control-icon">
+          ☀️
+        </div>
+
+        <div class="control-name">
+          ไฟตู้ปลา
+        </div>
+
+        <div class="control-status">
+          เปิดอยู่
+        </div>
+
+      </div>
+
     </div>
 
-    <div class="input-row">
-      <input type="text" id="userInput" placeholder="ถาม AI เกี่ยวกับตู้ปลา...">
-      <button class="send-btn" onclick="sendMessage()">➤</button>
+    <!-- CHAT -->
+
+    <div class="chat-box" id="chatBox">
+
+      <div class="msg ai-msg">
+        สวัสดีครับ 👋<br>
+        มีอะไรให้ผมช่วยดูแลตู้ปลาไหมครับ?
+      </div>
+
     </div>
+
   </div>
+
+  <!-- INPUT -->
+
+  <div class="input-row">
+
+    <div class="input-wrap">
+
+      <input
+      type="text"
+      id="userInput"
+      placeholder="พิมพ์ข้อความ..." />
+
+      <button
+      class="send-btn"
+      onclick="sendMessage()">
+      ➤
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- NAV -->
+
+  <div class="bottom-nav">
+
+    <div
+    class="nav-item active"
+    id="homeNav"
+    onclick="showPage('home')">
+
+      <div class="nav-icon">
+        🏠
+      </div>
+
+      <div>
+        บ้าน
+      </div>
+
+    </div>
+
+    <div
+    class="nav-item"
+    id="statsNav"
+    onclick="showPage('stats')">
+
+      <div class="nav-icon">
+        📊
+      </div>
+
+      <div>
+        สถิติ
+      </div>
+
+    </div>
+
+    <div
+    class="nav-item"
+    id="aiNav"
+    onclick="showPage('ai')">
+
+      <div class="nav-icon">
+        🤖
+      </div>
+
+      <div>
+        AI ผู้ช่วย
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
-const sheetURL="https://docs.google.com/spreadsheets/d/1dRyT0iPaTrrxnfon_TEqO6rcdZSSHGwUGZG-H0KjZYQ/export?format=csv";
 
-let labels=[],temps=[],phs=[],tempChart,phChart;
+/* ===== PAGE ===== */
 
-const chartDefaults={
-  type:"line",
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    animation:{duration:400},
-    plugins:{
-      legend:{display:false},
-      tooltip:{
-        enabled:true,
-        backgroundColor:"#0f172a",
-        titleColor:"#94a3b8",
-        bodyColor:"#e2e8f0",
-        borderColor:"#334155",
-        borderWidth:1
-      }
+function showPage(page){
+
+  document
+  .querySelectorAll(".page")
+  .forEach(p=>p.classList.remove("active"));
+
+  document
+  .querySelectorAll(".nav-item")
+  .forEach(n=>n.classList.remove("active"));
+
+  if(page==="home"){
+
+    document
+    .getElementById("homePage")
+    .classList.add("active");
+
+    document
+    .getElementById("homeNav")
+    .classList.add("active");
+  }
+
+  else if(page==="stats"){
+
+    document
+    .getElementById("statsPage")
+    .classList.add("active");
+
+    document
+    .getElementById("statsNav")
+    .classList.add("active");
+  }
+
+  else{
+
+    document
+    .getElementById("aiPage")
+    .classList.add("active");
+
+    document
+    .getElementById("aiNav")
+    .classList.add("active");
+  }
+}
+
+/* ===== MAIN TEMP CHART ===== */
+
+new Chart(
+  document.getElementById("tempChart"),
+  {
+    type:"line",
+
+    data:{
+      labels:[
+        "00:00",
+        "04:00",
+        "08:00",
+        "12:00",
+        "16:00",
+        "20:00"
+      ],
+
+      datasets:[{
+
+        data:[
+          24.5,
+          24.2,
+          26.4,
+          25.1,
+          26.3,
+          24.8
+        ],
+
+        borderColor:"#c7a66c",
+
+        backgroundColor:
+        "rgba(199,166,108,0.12)",
+
+        fill:true,
+
+        tension:0.4,
+
+        pointRadius:0,
+
+        borderWidth:3
+
+      }]
     },
-    scales:{
-      y:{
-        grid:{color:"rgba(255,255,255,0.05)"},
-        ticks:{color:"#475569",font:{size:11}},
-        border:{color:"transparent"}
+
+    options:{
+
+      responsive:true,
+
+      maintainAspectRatio:false,
+
+      plugins:{
+        legend:{
+          display:false
+        }
       },
-      x:{
-        grid:{display:false},
-        ticks:{color:"#475569",font:{size:10},maxTicksLimit:6},
-        border:{color:"transparent"}
+
+      scales:{
+
+        x:{
+          grid:{
+            display:false
+          },
+
+          ticks:{
+            color:"#8b7f71"
+          }
+        },
+
+        y:{
+          grid:{
+            color:"rgba(0,0,0,0.04)"
+          },
+
+          ticks:{
+            color:"#8b7f71"
+          }
+        }
+
       }
+
     }
+
   }
-};
+);
 
-async function loadData(){
-  try{
-    const res = await fetch(sheetURL);
-    if(!res.ok) throw new Error("HTTP " + res.status);
+/* ===== STATS TEMP ===== */
 
-    const text = await res.text();
+new Chart(
+  document.getElementById("statsTempChart"),
+  {
+    type:"line",
 
-    console.log("RAW CSV:", text.slice(0,200));
-
-    const rows = text.split(/\r?\n/);
-
-    labels = [];
-    temps = [];
-    phs = [];
-
-    for(let i=1;i<rows.length;i++){
-      const row = rows[i].trim();
-      if(!row) continue;
-
-      // ✅ robust CSV split (รองรับ "...")
-      const cols = parseCSV(row);
-
-      if(cols.length < 4) continue;
-
-      const date = cols[0];
-      const time = cols[1];
-
-      const temp = parseFloat(cols[2]);
-      const ph   = parseFloat(cols[3]);
-
-      if(isNaN(temp) || isNaN(ph)) continue;
-
-      labels.push(`${date} ${time}`);
-      temps.push(temp);
-      phs.push(ph);
-    }
-
-    console.log("labels:", labels.length);
-    console.log("temps:", temps.length);
-    console.log("phs:", phs.length);
-
-    if(labels.length === 0){
-      console.warn("❌ NO DATA FOUND (check sheet format or permission)");
-      return;
-    }
-
-    document.getElementById("temp").textContent = `${temps.at(-1)} °C`;
-    document.getElementById("ph").textContent = `${phs.at(-1)}`;
-    document.getElementById("time").textContent = labels.at(-1);
-
-    drawCharts();
-
-  }catch(e){
-    console.error("Load error:", e);
-  }
-}
-
-// 🔥 CSV parser ที่ “ไม่พัง”
-function parseCSV(str){
-  const result = [];
-  let cur = "";
-  let inQuotes = false;
-
-  for(let i=0;i<str.length;i++){
-    const c = str[i];
-
-    if(c === '"') inQuotes = !inQuotes;
-    else if(c === ',' && !inQuotes){
-      result.push(cur.trim().replace(/"/g,''));
-      cur = "";
-    } else {
-      cur += c;
-    }
-  }
-
-  result.push(cur.trim().replace(/"/g,''));
-  return result;
-}
-
-function drawCharts(){
-  if(tempChart) tempChart.destroy();
-  if(phChart) phChart.destroy();
-
-  const ctx1=document.getElementById("tempChart").getContext("2d");
-  const ctx2=document.getElementById("phChart").getContext("2d");
-
-  tempChart=new Chart(ctx1,{
-    ...chartDefaults,
     data:{
-      labels,
+      labels:[
+        "00",
+        "04",
+        "08",
+        "12",
+        "16",
+        "20"
+      ],
+
       datasets:[{
-        label:"Temp",
-        data:temps,
-        borderColor:"#38bdf8",
-        backgroundColor:"rgba(56,189,248,0.06)",
+
+        data:[
+          25,
+          26,
+          26.5,
+          27,
+          26.7,
+          26.2
+        ],
+
+        borderColor:"#c7a66c",
+
+        backgroundColor:
+        "rgba(199,166,108,0.12)",
+
         fill:true,
+
         tension:0.4,
+
         pointRadius:0,
-        borderWidth:2
+
+        borderWidth:3
+
       }]
     },
-    options:{
-      ...chartDefaults.options,
-      scales:{...chartDefaults.options.scales,y:{min:20,max:35}}
-    }
-  });
 
-  phChart=new Chart(ctx2,{
-    ...chartDefaults,
+    options:{
+
+      responsive:true,
+
+      maintainAspectRatio:false,
+
+      plugins:{
+        legend:{
+          display:false
+        }
+      }
+
+    }
+
+  }
+);
+
+/* ===== STATS PH ===== */
+
+new Chart(
+  document.getElementById("statsPhChart"),
+  {
+    type:"line",
+
     data:{
-      labels,
+      labels:[
+        "00",
+        "04",
+        "08",
+        "12",
+        "16",
+        "20"
+      ],
+
       datasets:[{
-        label:"pH",
-        data:phs,
-        borderColor:"#34d399",
-        backgroundColor:"rgba(52,211,153,0.06)",
+
+        data:[
+          7.0,
+          7.1,
+          7.2,
+          7.3,
+          7.2,
+          7.1
+        ],
+
+        borderColor:"#8dbb8c",
+
+        backgroundColor:
+        "rgba(141,187,140,0.12)",
+
         fill:true,
+
         tension:0.4,
+
         pointRadius:0,
-        borderWidth:2
+
+        borderWidth:3
+
       }]
     },
+
     options:{
-      ...chartDefaults.options,
-      scales:{...chartDefaults.options.scales,y:{min:0,max:14}}
+
+      responsive:true,
+
+      maintainAspectRatio:false,
+
+      plugins:{
+        legend:{
+          display:false
+        }
+      }
+
     }
-  });
-}
 
-// ===== chat (เหมือนเดิม) =====
-function addMsg(sender,text,type){
-  const box=document.getElementById("chatBox");
+  }
+);
 
-  const lbl=document.createElement("div");
-  lbl.className="msg-label";
-  lbl.style.alignSelf=type==="user"?"flex-end":"flex-start";
-  lbl.textContent=sender;
+/* ===== CHAT ===== */
 
-  const div=document.createElement("div");
-  div.className="msg "+type;
-  div.textContent=text;
+function sendMessage(){
 
-  box.appendChild(lbl);
-  box.appendChild(div);
-  box.scrollTop=box.scrollHeight;
-}
+  const input =
+  document.getElementById("userInput");
 
-function quickAsk(t){
-  document.getElementById("userInput").value=t;
-  sendMessage();
-}
+  const text =
+  input.value.trim();
 
-async function sendMessage(){
-  const input=document.getElementById("userInput");
-  const q=input.value.trim();
-  if(!q)return;
+  if(!text) return;
 
-  addMsg("คุณ",q,"user");
+  addMessage(text,"user");
+
   input.value="";
 
-  addMsg("AI","กำลังวิเคราะห์...","ai");
+  setTimeout(()=>{
 
-  try{
-    const res=await fetch("/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({question:q})
-    });
+    addMessage(
+      "ระบบกำลังวิเคราะห์ข้อมูลจากเซ็นเซอร์แบบ Real-time",
+      "ai"
+    );
 
-    const data=await res.json();
-
-    const box=document.getElementById("chatBox");
-    box.removeChild(box.lastChild);
-    box.removeChild(box.lastChild);
-
-    addMsg("AI",data.result,"ai");
-
-  }catch(e){
-    const box=document.getElementById("chatBox");
-    box.removeChild(box.lastChild);
-    box.removeChild(box.lastChild);
-
-    addMsg("AI","เชื่อมต่อ AI ไม่สำเร็จ","ai");
-  }
+  },700);
 }
 
-document.getElementById("userInput")
-  .addEventListener("keypress",e=>{
-    if(e.key==="Enter")sendMessage();
-  });
+function addMessage(text,type){
 
-loadData();
-setInterval(loadData,5000);
+  const box =
+  document.getElementById("chatBox");
+
+  const div =
+  document.createElement("div");
+
+  div.className =
+  "msg " +
+  (type==="user"
+  ? "user-msg"
+  : "ai-msg");
+
+  div.innerHTML=text;
+
+  box.appendChild(div);
+
+  box.scrollTop =
+  box.scrollHeight;
+}
+
+document
+.getElementById("userInput")
+.addEventListener(
+  "keypress",
+  e=>{
+    if(e.key==="Enter"){
+      sendMessage();
+    }
+  }
+);
+
 </script>
+
+</body>
+</html>
