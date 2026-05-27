@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>AquaMind</title>
+<title>AquaCore</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -116,19 +116,6 @@ body{
   font-size:18px;
   font-weight:600;
   color:#443a32;
-}
-
-/* ===== WELCOME ===== */
-
-.welcome h1{
-  font-size:36px;
-  line-height:1.2;
-  margin-bottom:8px;
-}
-
-.welcome p{
-  color:#85796c;
-  font-size:14px;
 }
 
 /* ===== STATUS CARD ===== */
@@ -280,6 +267,8 @@ body{
 
   box-shadow:
   0 6px 18px rgba(0,0,0,0.04);
+
+  margin-bottom:18px;
 }
 
 .chart-header{
@@ -461,6 +450,8 @@ body{
   max-width:500px;
 
   padding:0 18px;
+
+  display:none;
 }
 
 .input-wrap{
@@ -564,7 +555,7 @@ body{
     <div class="top-header">
 
       <div class="logo">
-        Aqua<span>Mind</span>
+        Aqua<span>Core</span>
       </div>
 
       <div class="date-box">
@@ -586,6 +577,8 @@ body{
         </div>
 
       </div>
+
+    </div>
 
     <!-- STATUS -->
 
@@ -708,22 +701,8 @@ body{
   <div class="page" id="statsPage">
 
     <div class="logo">
-      Aqua<span>Mind</span>
+      Aqua<span>Core</span>
     </div>
-
-    <div class="welcome">
-
-      <h1>
-        สถิติระบบ
-      </h1>
-
-      <p>
-        วิเคราะห์ข้อมูลย้อนหลัง
-      </p>
-
-    </div>
-
-    <!-- FILTER -->
 
     <div class="filter-row">
 
@@ -741,8 +720,6 @@ body{
 
     </div>
 
-    <!-- TEMP -->
-
     <div class="chart-card">
 
       <div class="chart-header">
@@ -759,11 +736,7 @@ body{
 
     </div>
 
-    <!-- PH -->
-
-    <div
-    class="chart-card"
-    style="margin-top:18px;">
+    <div class="chart-card">
 
       <div class="chart-header">
 
@@ -805,8 +778,6 @@ body{
 
     </div>
 
-    <!-- CONTROL -->
-
     <div class="control-title">
       การควบคุมด่วน
     </div>
@@ -814,72 +785,18 @@ body{
     <div class="control-grid">
 
       <div class="control-card">
-
-        <div class="control-icon">
-          🌀
-        </div>
-
-        <div class="control-name">
-          เปิดพัดลม
-        </div>
-
-        <div class="control-status">
-          อัตโนมัติ
-        </div>
-
+        <div class="control-icon">🌀</div>
+        <div class="control-name">เปิดพัดลม</div>
+        <div class="control-status">อัตโนมัติ</div>
       </div>
 
       <div class="control-card">
-
-        <div class="control-icon">
-          💧
-        </div>
-
-        <div class="control-name">
-          ปั๊มน้ำ
-        </div>
-
-        <div class="control-status">
-          อัตโนมัติ
-        </div>
-
-      </div>
-
-      <div class="control-card">
-
-        <div class="control-icon">
-          🫧
-        </div>
-
-        <div class="control-name">
-          ปั๊มออกซิเจน
-        </div>
-
-        <div class="control-status">
-          อัตโนมัติ
-        </div>
-
-      </div>
-
-      <div class="control-card">
-
-        <div class="control-icon">
-          ☀️
-        </div>
-
-        <div class="control-name">
-          ไฟตู้ปลา
-        </div>
-
-        <div class="control-status">
-          เปิดอยู่
-        </div>
-
+        <div class="control-icon">💧</div>
+        <div class="control-name">ปั๊มน้ำ</div>
+        <div class="control-status">อัตโนมัติ</div>
       </div>
 
     </div>
-
-    <!-- CHAT -->
 
     <div class="chat-box" id="chatBox">
 
@@ -922,13 +839,9 @@ body{
     id="homeNav"
     onclick="showPage('home')">
 
-      <div class="nav-icon">
-        🏠
-      </div>
+      <div class="nav-icon">🏠</div>
 
-      <div>
-        บ้าน
-      </div>
+      <div>บ้าน</div>
 
     </div>
 
@@ -937,13 +850,9 @@ body{
     id="statsNav"
     onclick="showPage('stats')">
 
-      <div class="nav-icon">
-        📊
-      </div>
+      <div class="nav-icon">📊</div>
 
-      <div>
-        สถิติ
-      </div>
+      <div>สถิติ</div>
 
     </div>
 
@@ -952,13 +861,9 @@ body{
     id="aiNav"
     onclick="showPage('ai')">
 
-      <div class="nav-icon">
-        🤖
-      </div>
+      <div class="nav-icon">🤖</div>
 
-      <div>
-        AI ผู้ช่วย
-      </div>
+      <div>AI ผู้ช่วย</div>
 
     </div>
 
@@ -980,6 +885,9 @@ function showPage(page){
   .querySelectorAll(".nav-item")
   .forEach(n=>n.classList.remove("active"));
 
+  const inputRow =
+  document.querySelector(".input-row");
+
   if(page==="home"){
 
     document
@@ -989,6 +897,8 @@ function showPage(page){
     document
     .getElementById("homeNav")
     .classList.add("active");
+
+    inputRow.style.display="none";
   }
 
   else if(page==="stats"){
@@ -1000,6 +910,8 @@ function showPage(page){
     document
     .getElementById("statsNav")
     .classList.add("active");
+
+    inputRow.style.display="none";
   }
 
   else{
@@ -1011,6 +923,8 @@ function showPage(page){
     document
     .getElementById("aiNav")
     .classList.add("active");
+
+    inputRow.style.display="block";
   }
 }
 
@@ -1068,30 +982,6 @@ new Chart(
         legend:{
           display:false
         }
-      },
-
-      scales:{
-
-        x:{
-          grid:{
-            display:false
-          },
-
-          ticks:{
-            color:"#8b7f71"
-          }
-        },
-
-        y:{
-          grid:{
-            color:"rgba(0,0,0,0.04)"
-          },
-
-          ticks:{
-            color:"#8b7f71"
-          }
-        }
-
       }
 
     }
@@ -1240,7 +1130,7 @@ function sendMessage(){
   setTimeout(()=>{
 
     addMessage(
-      "ระบบกำลังวิเคราะห์ข้อมูลจากเซ็นเซอร์แบบ Real-time",
+      "ในอีก2ชั่วโมงมีแนวโน้มว่าอุณหภูมิ จะอยู่ที่24°C",
       "ai"
     );
 
